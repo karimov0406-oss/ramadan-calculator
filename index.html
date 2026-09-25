@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Калькулятор пропущенных постов Рамадана</title>
 
 <style>
@@ -15,11 +14,11 @@
   --line:#dfe3dc;
   --accent:#315c43;
   --accent2:#e8f0ea;
+  --error:#9b2c2c;
+  --error-bg:#fbeaea;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -85,8 +84,7 @@ label{
   margin-bottom:6px;
 }
 
-input,
-button{
+input,button{
   font:inherit;
 }
 
@@ -104,17 +102,14 @@ input{
 button{
   border:0;
   border-radius:10px;
-  min-height:44px;
+  min-height:50px;
   padding:9px 15px;
   background:var(--accent);
   color:#fff;
   font-weight:700;
   cursor:pointer;
-}
-
-button.secondary{
-  background:var(--accent2);
-  color:var(--accent);
+  width:100%;
+  font-size:17px;
 }
 
 button:focus-visible,
@@ -129,6 +124,15 @@ input:focus-visible{
   padding:12px 14px;
   border-radius:10px;
   font-size:14px;
+}
+
+.error{
+  border-left:4px solid var(--error);
+  background:var(--error-bg);
+  color:var(--error);
+  padding:14px;
+  border-radius:10px;
+  font-weight:700;
 }
 
 .muted{
@@ -189,30 +193,80 @@ input:focus-visible{
   font-weight:700;
 }
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
 .footer{
   color:var(--muted);
   font-size:12px;
   margin-top:18px;
 }
 
+.hidden{
+  display:none;
+}
+
 @media(max-width:650px){
+  main{
+    padding:20px 12px 40px;
+  }
 
   .grid{
     grid-template-columns:1fr;
   }
 
   .result{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .metric strong{
+    font-size:21px;
+  }
+
+  .card{
+    padding:15px;
+  }
+}
+
+@media(max-width:400px){
+  .result{
     grid-template-columns:1fr;
+  }
+}
+
+/* Печать */
+@media print{
+  body{
+    background:#fff;
+  }
+
+  main{
+    max-width:none;
+    padding:0;
+  }
+
+  .hero{
+    padding:0 0 15px;
+  }
+
+  .card{
+    box-shadow:none;
+    border:1px solid #ccc;
+    page-break-inside:avoid;
+  }
+
+  #inputSection,
+  #yearsSection,
+  #printSection,
+  #errorBox{
+    display:none !important;
+  }
+
+  #resultSection,
+  #explanationSection,
+  #summarySection{
+    display:block !important;
   }
 
   .result{
-    gap:8px;
+    grid-template-columns:repeat(4,1fr);
   }
 }
 </style>
@@ -223,305 +277,195 @@ input:focus-visible{
 <main>
 
 <section class="hero">
-
-<div class="eyebrow">
-Рамадан • када • фидья
-</div>
-
-<h1>
-Калькулятор пропущенных постов
-</h1>
-
-<p class="lead">
-Расчёт пропущенных постов Рамадана и фидьи за задержку возмещения.
-</p>
-
+  <div class="eyebrow">Рамадан • када • фидья</div>
+  <h1>Калькулятор пропущенных постов</h1>
+  <p class="lead">
+    Расчёт пропущенных постов Рамадана и фидьи за задержку возмещения.
+  </p>
 </section>
-
 
 <div class="note">
-
-<strong>Важно:</strong>
-калькулятор является справочным инструментом.
-Фикховые вопросы в отдельных обстоятельствах могут требовать уточнения у знающего учёного.
-
+  <strong>Важно:</strong>
+  калькулятор является справочным инструментом.
+  Фикховые вопросы в отдельных обстоятельствах могут требовать
+  уточнения у знающего учёного.
 </div>
 
+<section class="card" id="inputSection">
+  <h2>1. Укажите период</h2>
 
-<section class="card">
+  <div class="grid">
 
-<h2>1. Укажите период</h2>
+    <div>
+      <label for="from">С какого года</label>
+      <input
+        id="from"
+        type="number"
+        min="1900"
+        max="2100"
+        placeholder="Например, 2020"
+      >
+    </div>
 
-<div class="grid">
+    <div>
+      <label for="to">По какой год</label>
+      <input
+        id="to"
+        type="number"
+        min="1900"
+        max="2100"
+        placeholder="Например, 2025"
+      >
+    </div>
 
-<div>
+  </div>
 
-<label for="from">
-С какого года
-</label>
+  <div class="grid" style="margin-top:14px">
 
-<input
-id="from"
-type="number"
-min="1900"
-max="2100"
-value="2020"
->
+    <div>
+      <label for="current">До какого Рамадана считать задержку</label>
+      <input
+        id="current"
+        type="number"
+        min="1900"
+        max="2100"
+        placeholder="Например, 2026"
+      >
+    </div>
 
-</div>
+    <div>
+      <label for="price">Цена одного мудда, ₽ <span class="muted">(необязательно)</span></label>
+      <input
+        id="price"
+        type="number"
+        min="0"
+        max="1000000"
+        step="1"
+        placeholder="Например, 150"
+      >
+    </div>
 
+  </div>
 
-<div>
+  <p class="muted">
+    Если весь Рамадан был пропущен, по умолчанию устанавливается 30 дней.
+    Количество дней каждого года можно изменить вручную.
+  </p>
 
-<label for="to">
-По какой год
-</label>
-
-<input
-id="to"
-type="number"
-min="1900"
-max="2100"
-value="2025"
->
-
-</div>
-
-</div>
-
-
-<div
-class="grid"
-style="margin-top:14px"
->
-
-<div>
-
-<label for="current">
-До какого Рамадана считать задержку
-</label>
-
-<input
-id="current"
-type="number"
-min="1900"
-max="2100"
-value="2026"
->
-
-</div>
-
-
-<div>
-
-<label for="price">
-Цена одного мудда, ₽
-</label>
-
-<input
-id="price"
-type="number"
-min="0"
-max="1000000"
-step="1"
-value="150"
->
-
-</div>
-
-</div>
-
-
-<p class="muted">
-
-Если весь Рамадан был пропущен,
-по умолчанию устанавливается 30 дней.
-Количество дней каждого года можно изменить вручную.
-
-</p>
-<button id="calculateButton" style="width:100%;margin-top:8px;font-size:17px;min-height:50px;">
-Рассчитать
-</button>
-</section>
-
-
-<section class="card">
-
-<h2>
-2. Пропуски по годам
-</h2>
-
-<div id="years"></div>
+  <button id="calculateButton">
+    Рассчитать
+  </button>
 
 </section>
 
 
-<section class="card">
+<section class="card" id="yearsSection">
+  <h2>2. Пропуски по годам</h2>
 
-<h2>
-3. Результат
-</h2>
-
-<div class="result">
-
-<div class="metric">
-
-<span>
-Када
-</span>
-
-<strong id="qada">
-0 дней
-</strong>
-
-</div>
-
-
-<div class="metric">
-
-<span>
-Муддов фидьи
-</span>
-
-<strong id="mudd">
-0
-</strong>
-
-</div>
-
-
-<div class="metric">
-
-<span>
-Количество пищи
-</span>
-
-<strong id="food">
-0 кг
-</strong>
-
-</div>
-
-
-<div class="metric">
-
-<span>
-Расчётная сумма
-</span>
-
-<strong id="money">
-0 ₽
-</strong>
-
-</div>
-
-</div>
-
+  <div id="years">
+    <p class="muted">
+      Сначала укажите период расчёта.
+    </p>
+  </div>
 </section>
 
 
-<section class="card">
+<div id="errorBox" class="error hidden"></div>
 
-<h2>
-Подробный расчёт
-</h2>
 
-<div class="tablewrap">
+<section class="card hidden" id="resultSection">
+  <h2>3. Результат</h2>
 
-<table class="table">
+  <div class="result">
 
-<thead>
+    <div class="metric">
+      <span>Када</span>
+      <strong id="qada">0 дней</strong>
+    </div>
 
-<tr>
+    <div class="metric">
+      <span>Мудды фидьи</span>
+      <strong id="mudd">0</strong>
+    </div>
 
-<th>
-Год
-</th>
+    <div class="metric">
+      <span>Количество пищи</span>
+      <strong id="food">0 кг</strong>
+    </div>
 
-<th>
-Пропущено
-</th>
+    <div class="metric">
+      <span>Расчётная сумма</span>
+      <strong id="money">—</strong>
+    </div>
 
-<th>
-Прошло Рамаданов
-</th>
-
-<th>
-Муддов
-</th>
-
-<th>
-Сумма
-</th>
-
-</tr>
-
-</thead>
-
-<tbody id="summary"></tbody>
-
-</table>
-
-</div>
-
+  </div>
 </section>
 
 
+<section class="card hidden" id="explanationSection">
+  <h2>Как считается</h2>
+
+  <p>
+    За каждый пропущенный день, который не был возмещён до следующего
+    Рамадана, добавляется <strong>1 мудд фидьи</strong> за каждый
+    прошедший Рамадан.
+  </p>
+
+  <p>
+    Например, если <strong>10 дней</strong> были пропущены в 2023 году,
+    а расчёт ведётся до Рамадана 2026 года, учитываются 3 прошедших
+    Рамадана:
+    <strong>10 × 3 = 30 муддов</strong>.
+  </p>
+
+  <div class="note">
+    <strong>Важно:</strong>
+    расчёт денежной суммы выполняется по цене одного мудда,
+    которую указал пользователь. Вопросы о размере фидьи и способе
+    её выплаты в отдельных обстоятельствах требуют уточнения по фикху.
+  </div>
 </section>
 
-<section class="card">
-<h2>Как считается</h2>
 
-<p>
-За каждый пропущенный день, который не был возмещён до следующего Рамадана,
-добавляется <strong>1 мудд фидьи</strong> за каждый прошедший Рамадан.
-</p>
+<section class="card hidden" id="summarySection">
+  <h2>Подробный расчёт</h2>
 
-<p>
-Например, если <strong>10 дней</strong> были пропущены в 2023 году,
-а расчёт ведётся до Рамадана 2026 года, учитываются 3 прошедших Рамадана:
-<strong>10 × 3 = 30 муддов</strong>.
-</p>
+  <div class="tablewrap">
 
-<div class="note">
-<strong>Важно:</strong>
-расчёт денежной суммы выполняется по цене одного мудда,
-которую указал пользователь. Вопросы о размере фидьи и способе её выплаты
-в отдельных обстоятельствах требуют уточнения по фикху.
-</div>
+    <table class="table">
+
+      <thead>
+        <tr>
+          <th>Год</th>
+          <th>Пропущено</th>
+          <th>Прошло Рамаданов</th>
+          <th>Муддов</th>
+          <th>Сумма</th>
+        </tr>
+      </thead>
+
+      <tbody id="summary"></tbody>
+
+    </table>
+
+  </div>
 </section>
 
-<section class="card">
-<h2>Подробный расчёт</h2>
 
-<h2>
-Проверка и печать
-</h2>
+<section class="card hidden" id="printSection">
 
-<div class="actions">
+  <h2>Проверка и печать</h2>
 
-<button id="print">
-Распечатать результат
-</button>
+  <button id="print">
+    Распечатать результат
+  </button>
 
-<button
-id="reset"
-class="secondary"
->
-Сбросить
-</button>
-
-</div>
-
-<p class="footer">
-
-Для расчёта количества пищи используется приблизительное значение:
-1 мудд ≈ 0,51 кг.
-
-Денежная сумма рассчитывается по цене одного мудда,
-которую ввёл пользователь.
-
-</p>
+  <p class="footer">
+    Для расчёта количества пищи используется приблизительное значение:
+    1 мудд ≈ 0,51 кг.
+    Денежная сумма рассчитывается по цене одного мудда,
+    которую ввёл пользователь.
+  </p>
 
 </section>
 
@@ -529,453 +473,520 @@ class="secondary"
 
 
 <script>
-
 (function(){
 
-const from = document.getElementById('from');
-const to = document.getElementById('to');
-const current = document.getElementById('current');
-const price = document.getElementById('price');
+  const from = document.getElementById('from');
+  const to = document.getElementById('to');
+  const current = document.getElementById('current');
+  const price = document.getElementById('price');
 
-const years = document.getElementById('years');
-const summary = document.getElementById('summary');
+  const years = document.getElementById('years');
+  const summary = document.getElementById('summary');
 
-const qadaElement = document.getElementById('qada');
-const muddElement = document.getElementById('mudd');
-const foodElement = document.getElementById('food');
-const moneyElement = document.getElementById('money');
+  const errorBox = document.getElementById('errorBox');
 
+  const resultSection = document.getElementById('resultSection');
+  const explanationSection = document.getElementById('explanationSection');
+  const summarySection = document.getElementById('summarySection');
+  const printSection = document.getElementById('printSection');
 
+  const qadaElement = document.getElementById('qada');
+  const muddElement = document.getElementById('mudd');
+  const foodElement = document.getElementById('food');
+  const moneyElement = document.getElementById('money');
 
-function formatNumber(number){
+  const calculateButton = document.getElementById('calculateButton');
+  const printButton = document.getElementById('print');
 
-return new Intl.NumberFormat(
-'ru-RU',
-{
-maximumFractionDigits:2
-}
-).format(number);
 
-}
+  function formatNumber(number){
+    return new Intl.NumberFormat('ru-RU',{
+      maximumFractionDigits:2
+    }).format(number);
+  }
 
 
+  function plural(number, one, few, many){
 
-function daysWord(number){
+    number = Math.abs(number);
 
-number = Math.abs(number);
+    const lastTwo = number % 100;
+    const last = number % 10;
 
-if(
-number % 10 === 1 &&
-number % 100 !== 11
-){
+    if(last === 1 && lastTwo !== 11){
+      return one;
+    }
 
-return 'день';
+    if(
+      last >= 2 &&
+      last <= 4 &&
+      !(lastTwo >= 12 && lastTwo <= 14)
+    ){
+      return few;
+    }
 
-}
+    return many;
+  }
 
-if(
-number % 10 >= 2 &&
-number % 10 <= 4 &&
-!(
-number % 100 >= 12 &&
-number % 100 <= 14
-)
-){
 
-return 'дня';
+  function daysWord(number){
+    return plural(number,'день','дня','дней');
+  }
 
-}
 
-return 'дней';
+  function muddWord(number){
+    return plural(number,'мудд','мудда','муддов');
+  }
 
-}
 
+  function ramadanWord(number){
+    return plural(number,'Рамадан','Рамадана','Рамаданов');
+  }
 
 
-function getNumber(element){
+  function getInteger(element){
 
-const value = parseInt(
-element.value,
-10
-);
+    const value = element.value.trim();
 
-if(
-!Number.isFinite(value)
-){
+    if(value === ''){
+      return null;
+    }
 
-return null;
+    const number = Number(value);
 
-}
+    if(!Number.isInteger(number)){
+      return null;
+    }
 
-return value;
+    return number;
+  }
 
-}
 
+  function showError(message){
 
+    errorBox.textContent = message;
+    errorBox.classList.remove('hidden');
 
-function buildYears(){
+    resultSection.classList.add('hidden');
+    explanationSection.classList.add('hidden');
+    summarySection.classList.add('hidden');
+    printSection.classList.add('hidden');
+  }
 
-const start = getNumber(from);
-const end = getNumber(to);
 
-if(
-start === null ||
-end === null
-){
+  function hideError(){
+    errorBox.classList.add('hidden');
+    errorBox.textContent = '';
+  }
 
-years.innerHTML =
-'<div class="note">Введите оба года.</div>';
 
-summary.innerHTML = '';
+  function buildYears(){
 
-return;
+    hideError();
 
-}
+    const start = getInteger(from);
+    const end = getInteger(to);
 
+    years.innerHTML = '';
 
-if(start > end){
+    if(start === null || end === null){
 
-return;
+      years.innerHTML =
+        '<p class="muted">Сначала укажите период расчёта.</p>';
 
-}
+      return;
+    }
 
 
-if(end - start > 50){
+    if(start < 1900 || end > 2100){
 
-years.innerHTML =
-'<div class="note">Максимальный период — 51 Рамадан.</div>';
+      showError('Ошибка в данных. Проверьте введённые годы.');
+      years.innerHTML =
+        '<p class="muted">Проверьте указанный период.</p>';
 
-summary.innerHTML = '';
+      return;
+    }
 
-return;
 
-}
+    if(start > end){
 
+      showError('Ошибка в данных. Начальный год не может быть позже конечного года.');
 
-years.innerHTML = '';
+      return;
+    }
 
 
-for(
-let year = start;
-year <= end;
-year++
-){
+    if(end - start > 50){
 
-const row =
-document.createElement('div');
+      showError('Ошибка в данных. Максимальный период — 51 Рамадан.');
 
-row.className = 'card';
+      return;
+    }
 
-row.style.marginTop = '10px';
 
-row.dataset.year = year;
+    for(let year = start; year <= end; year++){
 
+      const row = document.createElement('div');
 
-row.innerHTML = `
+      row.className = 'card';
+      row.style.marginTop = '10px';
+      row.dataset.year = year;
 
-<div class="year">
-Рамадан ${year}
-</div>
+      row.innerHTML = `
+        <div class="year">Рамадан ${year}</div>
 
-<div>
+        <div>
+          <label for="days-${year}">Пропущено дней</label>
 
-<label>
-Пропущено дней
-</label>
+          <input
+            id="days-${year}"
+            class="ydays"
+            type="number"
+            min="0"
+            max="30"
+            step="1"
+            value="30"
+          >
+        </div>
 
-<input
-class="ydays"
-type="number"
-min="0"
-max="30"
-value="30"
->
+        <p class="muted info" style="margin-bottom:0"></p>
+      `;
 
-</div>
+      years.appendChild(row);
+    }
 
-<p
-class="muted info"
-style="margin-bottom:0"
-></p>
 
-`;
+    years.querySelectorAll('.ydays').forEach(input => {
 
+      input.addEventListener('input',function(){
 
-years.appendChild(row);
+        hideError();
 
-}
+        resultSection.classList.add('hidden');
+        explanationSection.classList.add('hidden');
+        summarySection.classList.add('hidden');
+        printSection.classList.add('hidden');
 
+      });
 
-years
-.querySelectorAll('.ydays')
-.forEach(
-input => {
+    });
 
-input.addEventListener(
-'input',
-calculate
-);
+  }
 
-}
-);
 
+  function calculate(){
 
-calculate();
+    hideError();
 
-}
+    const start = getInteger(from);
+    const end = getInteger(to);
+    const currentYear = getInteger(current);
 
+    /*
+      Цена необязательная.
+      Если поле пустое — денежный расчёт не выполняется.
+    */
 
+    const priceText = price.value.trim();
 
-function calculate(){
+    let pricePerMudd = null;
 
-const currentYear = getNumber(current);
+    if(priceText !== ''){
 
-const pricePerMudd =
-Math.max(
-0,
-parseFloat(price.value) || 0
-);
+      pricePerMudd = Number(priceText);
 
+      if(
+        !Number.isFinite(pricePerMudd) ||
+        pricePerMudd < 0
+      ){
 
-if(currentYear === null){
+        showError('Ошибка в данных. Проверьте цену одного мудда.');
 
-return;
+        return;
+      }
 
-}
+    }
 
 
-let totalQada = 0;
+    if(
+      start === null ||
+      end === null ||
+      currentYear === null
+    ){
 
-let totalMudd = 0;
+      showError('Ошибка в данных. Заполните все необходимые поля.');
 
+      return;
+    }
 
-summary.innerHTML = '';
 
+    if(
+      start < 1900 ||
+      end > 2100 ||
+      currentYear < 1900 ||
+      currentYear > 2100
+    ){
 
-const rows =
-years.querySelectorAll(
-'[data-year]'
-);
+      showError('Ошибка в данных. Проверьте указанные годы.');
 
+      return;
+    }
 
-rows.forEach(
-row => {
 
-const year =
-Number(
-row.dataset.year
-);
+    if(start > end){
 
+      showError(
+        'Ошибка в данных. Начальный год не может быть позже конечного года.'
+      );
 
-const input =
-row.querySelector(
-'.ydays'
-);
+      return;
+    }
 
 
-let days =
-parseInt(
-input.value,
-10
-);
+    if(currentYear < start){
 
+      showError(
+        'Ошибка в данных. Рамадан, до которого ведётся расчёт, не может быть раньше периода пропусков.'
+      );
 
-if(
-!Number.isFinite(days)
-){
+      return;
+    }
 
-days = 0;
 
-}
+    if(end - start > 50){
 
+      showError(
+        'Ошибка в данных. Максимальный период — 51 Рамадан.'
+      );
 
-days =
-Math.max(
-0,
-Math.min(
-30,
-days
-)
-);
+      return;
+    }
 
 
-const elapsed =
-Math.max(
-0,
-currentYear - year
-);
+    const rows = years.querySelectorAll('[data-year]');
 
+    if(rows.length === 0){
 
-const mudd =
-days * elapsed;
+      showError(
+        'Ошибка в данных. Укажите период расчёта.'
+      );
 
+      return;
+    }
 
-totalQada += days;
 
-totalMudd += mudd;
+    let totalQada = 0;
+    let totalMudd = 0;
 
+    summary.innerHTML = '';
 
-const info =
-row.querySelector(
-'.info'
-);
 
+    for(const row of rows){
 
-if(days === 0){
+      const year = Number(row.dataset.year);
+      const input = row.querySelector('.ydays');
 
-info.textContent =
-'Пропусков нет.';
+      const rawDays = input.value.trim();
 
-}
+      if(rawDays === ''){
 
-else if(elapsed === 0){
+        showError(
+          'Ошибка в данных. Укажите количество пропущенных дней для каждого года.'
+        );
 
-info.textContent =
-'Задержка до следующего Рамадана ещё не учитывается.';
+        return;
+      }
 
-}
 
-else{
+      const days = Number(rawDays);
 
-info.textContent =
-days +
-' ' +
-daysWord(days) +
-' × ' +
-elapsed +
-' прошедших Рамадана = ' +
-mudd +
-' муддов.';
 
-}
+      if(
+        !Number.isInteger(days) ||
+        days < 0 ||
+        days > 30
+      ){
 
+        showError(
+          'Ошибка в данных. Количество пропущенных дней должно быть от 0 до 30.'
+        );
 
-if(days > 0){
+        return;
+      }
 
-const tr =
-document.createElement('tr');
 
+      /*
+        Количество последующих Рамаданов.
+        Если пропуск был в 2023,
+        а расчёт ведётся до 2026,
+        получаем 2026 - 2023 = 3.
+      */
 
-tr.innerHTML = `
+      const elapsed = Math.max(0,currentYear - year);
 
-<td>${year}</td>
+      const mudd = days * elapsed;
 
-<td>${days}</td>
 
-<td>${elapsed}</td>
+      totalQada += days;
+      totalMudd += mudd;
 
-<td>${mudd}</td>
 
-<td>${formatNumber(
-mudd * pricePerMudd
-)} ₽</td>
+      const info = row.querySelector('.info');
 
-`;
 
+      if(days === 0){
 
-summary.appendChild(tr);
+        info.textContent = 'Пропусков нет.';
 
-}
+      }else if(elapsed === 0){
 
-}
+        info.textContent =
+          days + ' ' + daysWord(days) +
+          '. Задержка до следующего Рамадана не учитывается.';
 
-);
+      }else{
 
+        info.textContent =
+          days + ' ' + daysWord(days) +
+          ' × ' +
+          elapsed + ' ' +
+          ramadanWord(elapsed) +
+          ' = ' +
+          mudd + ' ' +
+          muddWord(mudd) +
+          '.';
 
-const food =
-totalMudd * 0.51;
+      }
 
 
-const money =
-totalMudd * pricePerMudd;
+      if(days > 0){
 
+        const tr = document.createElement('tr');
 
-qadaElement.textContent =
-formatNumber(totalQada) +
-' ' +
-daysWord(totalQada);
+        let moneyCell = '—';
 
+        if(pricePerMudd !== null){
 
-muddElement.textContent =
-formatNumber(totalMudd);
+          moneyCell =
+            formatNumber(mudd * pricePerMudd) + ' ₽';
 
+        }
 
-foodElement.textContent =
-formatNumber(food) +
-' кг';
 
+        tr.innerHTML = `
+          <td>${year}</td>
+          <td>${days} ${daysWord(days)}</td>
+          <td>${elapsed} ${ramadanWord(elapsed)}</td>
+          <td>${mudd} ${muddWord(mudd)}</td>
+          <td>${moneyCell}</td>
+        `;
 
-moneyElement.textContent =
-formatNumber(money) +
-' ₽';
+        summary.appendChild(tr);
 
-}
+      }
 
+    }
 
 
-from.addEventListener(
-'input',
-buildYears
-);
+    const food = totalMudd * 0.51;
 
 
-to.addEventListener(
-'input',
-buildYears
-);
+    qadaElement.textContent =
+      formatNumber(totalQada) +
+      ' ' +
+      daysWord(totalQada);
 
 
-current.addEventListener(
-'input',
-calculate
-);
+    muddElement.textContent =
+      formatNumber(totalMudd) +
+      ' ' +
+      muddWord(totalMudd);
 
 
-price.addEventListener(
-document.getElementById('calculateButton').addEventListener('click',calculate);'input',
-calculate
-);
+    foodElement.textContent =
+      formatNumber(food) +
+      ' кг';
 
 
+    if(pricePerMudd === null){
 
-document
-.getElementById('print')
-.addEventListener(
-'click',
-function(){
+      moneyElement.textContent = '—';
 
-window.print();
+    }else{
 
-}
-);
+      moneyElement.textContent =
+        formatNumber(totalMudd * pricePerMudd) +
+        ' ₽';
 
+    }
 
 
-document
-.getElementById('reset')
-.addEventListener(
-'click',
-function(){
+    resultSection.classList.remove('hidden');
+    explanationSection.classList.remove('hidden');
+    summarySection.classList.remove('hidden');
+    printSection.classList.remove('hidden');
 
-from.value = 2020;
 
-to.value = 2025;
+    resultSection.scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
 
-current.value = 2026;
+  }
 
-price.value = 150;
 
-buildYears();
+  /*
+    При изменении периода сразу создаём список годов.
+    Сам расчёт выполняется только по кнопке «Рассчитать».
+  */
 
-}
-);
+  from.addEventListener('input',buildYears);
+  to.addEventListener('input',buildYears);
 
 
+  /*
+    Остальные поля не запускают расчёт автоматически.
+    Пользователь нажимает «Рассчитать».
+  */
 
-buildYears();
+
+  calculateButton.addEventListener('click',calculate);
+
+
+  /*
+    Возможность нажать Enter в любом поле.
+  */
+
+  [from,to,current,price].forEach(input => {
+
+    input.addEventListener('keydown',function(event){
+
+      if(event.key === 'Enter'){
+
+        event.preventDefault();
+        calculate();
+
+      }
+
+    });
+
+  });
+
+
+  printButton.addEventListener('click',function(){
+
+    window.print();
+
+  });
+
+
+  /*
+    Начальное состояние.
+  */
+
+  buildYears();
 
 })();
-
 </script>
 
 </body>
