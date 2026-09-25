@@ -93,11 +93,10 @@ function build(){
  if(b-a>50){years.innerHTML='<div class="note">Максимальный период — 51 Рамадан.</div>';calc();return}
  for(let y=a;y<=b;y++){
   const row=document.createElement('div');row.className='card';row.style.marginTop='10px';row.dataset.year=y;
-  row.innerHTML='<div class="year">Рамадан '+y+'</div><div class="grid"><div><label>Пропущено дней</label><input class="ydays" type="number" min="0" max="30" value="30></div><p class="muted info" style="margin-bottom:0"></p>';
+  row.innerHTML='<div class="year">Рамадан '+y+'</div><div class="grid"><div><label>Пропущено дней</label><input class="ydays" type="number" min="0" max="30" value="30"></div></div><p class="muted info" style="margin-bottom:0"></p>';
   years.appendChild(row);
  }
- years.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));
- years.querySelectorAll('select').forEach(x=>x.addEventListener('change',calc));
+ years.querySelectorAll('input').forEach(x=>x.addEventListener('input',calc));
  calc();
 }
 function calc(){
