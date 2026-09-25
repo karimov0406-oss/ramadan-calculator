@@ -85,9 +85,16 @@ const from=$('from'),to=$('to'),current=$('current'),price=$('price'),years=$('y
 const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n);
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function daysWord(n){return n%10===1&&n%100!==11?'день':(n%10>=2&&n%10<=4&&!(n%100>=12&&n%100<=14)?'дня':'дней')}
-function readInt(el,a,b){let n=parseInt(el.value,10);if(!Number.isFinite(n))n=a;return clamp(n,a,b)}
+function readInt(el,a,b){
+ let n=parseInt(el.value,10);
+ if(!Number.isFinite(n)) return null;
+ return clamp(n,a,b);
+}
 function build(){
- let a=readInt(from,1900,2100),b=readInt(to,1900,2100);
+ function build(){
+ let a=readInt(from,1900,2100);
+ let b=readInt(to,1900,2100);
+ if(a===null || b===null) return;
  if(a>b){[a,b]=[b,a];from.value=a;to.value=b}
  years.innerHTML='';
  if(b-a>50){years.innerHTML='<div class="note">Максимальный период — 51 Рамадан.</div>';calc();return}
