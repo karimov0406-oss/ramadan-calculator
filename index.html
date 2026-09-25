@@ -56,7 +56,7 @@ button.secondary{background:var(--accent2);color:var(--accent)}button:focus-visi
 <div class="result">
 <div class="metric"><span>Када</span><strong id="qada">0</strong></div>
 <div class="metric"><span>Муддов фидьи</span><strong id="mudd">0</strong></div>
-<div class="metric"><span>Объём пищи</span><strong id="liters">0 л</strong></div>
+<div class="metric"><span>Количество пищи</span><strong id="liters">0 кг</strong></div>
 <div class="metric"><span>Расчётная сумма</span><strong id="money">0 ₽</strong></div>
 </div>
 </section>
@@ -93,7 +93,7 @@ function build(){
  if(b-a>50){years.innerHTML='<div class="note">Максимальный период — 51 Рамадан.</div>';calc();return}
  for(let y=a;y<=b;y++){
   const row=document.createElement('div');row.className='card';row.style.marginTop='10px';row.dataset.year=y;
-  row.innerHTML='<div class="year">Рамадан '+y+'</div><div class="grid"><div><label>Пропущено дней</label><input class="ydays" type="number" min="0" max="30" value="30"></div><div><label>Причина задержки</label><select class="reason"><option value="no">Без уважительной причины</option><option value="yes">Была уважительная причина</option><option value="unknown">Не уверен — проверить отдельно</option></select></div></div><p class="muted info" style="margin-bottom:0"></p>';
+  row.innerHTML='<div class="year">Рамадан '+y+'</div><div class="grid"><div><label>Пропущено дней</label><input class="ydays" type="number" min="0" max="30" value="30></div><p class="muted info" style="margin-bottom:0"></p>';
   years.appendChild(row);
  }
  years.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));
@@ -105,14 +105,13 @@ function calc(){
  let qada=0,totalMudd=0;
  summary.innerHTML='';
  years.querySelectorAll('[data-year]').forEach(row=>{
-  const y=Number(row.dataset.year),d=clamp(parseInt(row.querySelector('.ydays').value,10)||0,0,30),reason=row.querySelector('.reason').value;
+  const y=Number(row.dataset.year),d=clamp(parseInt(row.querySelector('.ydays').value,10)||0,0,30);
   const elapsed=Math.max(0,cur-y);
-  const m=reason==='no'?d*elapsed:0;
+  const m=d*elapsed;
   qada+=d;totalMudd+=m;
   const info=row.querySelector('.info');
   if(!d) info.textContent='Пропусков нет.';
-  else if(reason==='yes') info.textContent='Уважительная причина указана: фидья за задержку не начислена; када остаётся в расчёте.';
-  else if(reason==='unknown') info.textContent='Причина требует уточнения — фидья за задержку пока не включена.';
+ 
   else if(!elapsed) info.textContent='Задержка до следующего Рамадана ещё не учитывается.';
   else info.textContent=d+' '+daysWord(d)+' × '+elapsed+' прошедших Рамадана = '+m+' муддов.';
   if(d){
