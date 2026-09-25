@@ -339,7 +339,9 @@ value="150"
 Количество дней каждого года можно изменить вручную.
 
 </p>
-
+<button id="calculateButton" style="width:100%;margin-top:8px;font-size:17px;min-height:50px;">
+Рассчитать
+</button>
 </section>
 
 
@@ -930,7 +932,7 @@ calculate
 
 
 price.addEventListener(
-'input',
+document.getElementById('calculateButton').addEventListener('click',calculate);'input',
 calculate
 );
 
