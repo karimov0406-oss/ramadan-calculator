@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Калькулятор пропущенных постов Рамадана</title>
+<style>
+:root{--bg:#f6f5f0;--card:#fff;--text:#182018;--muted:#687066;--line:#dfe3dc;--accent:#315c43;--accent2:#e8f0ea;--danger:#8a3d3d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45}
+main{max-width:860px;margin:0 auto;padding:28px 16px 50px}.hero{padding:12px 0 22px}.eyebrow{color:var(--accent);font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.08;margin:7px 0}.lead{color:var(--muted);margin:0;max-width:700px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 4px 18px rgba(20,30,20,.04)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+label{display:block;font-size:14px;font-weight:700;margin-bottom:6px}input,select,button{font:inherit}
+input,select{width:100%;min-height:46px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:9px 12px;color:var(--text);font-size:16px}
+button{border:0;border-radius:10px;min-height:44px;padding:9px 15px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:var(--accent2);color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #b8d0bf;outline-offset:2px}
+.note{border-left:4px solid var(--accent);background:var(--accent2);padding:12px 14px;border-radius:10px;font-size:14px}
+.muted{color:var(--muted);font-size:13px}.year{font-size:18px;font-weight:800;margin-bottom:12px}.hidden{display:none}
+.result{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:#f7f8f5;border-radius:12px;padding:13px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:24px;margin-top:3px}
+.tablewrap{overflow-x:auto}.table{width:100%;border-collapse:collapse;font-size:14px}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}.table th{color:var(--muted);font-weight:700}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.footer{color:var(--muted);font-size:12px;margin-top:18px}
+@media(max-width:650px){.grid,.grid3,.result{grid-template-columns:1fr}.result{gap:8px}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<div class="eyebrow">Рамадан • када • фидья</div>
+<h1>Калькулятор пропущенных постов</h1>
+<p class="lead">Расчёт по годам с возможностью указать общий период, количество пропущенных дней и собственную цену одного мудда.</p>
+</section>
+
+<div class="note"><strong>Важно:</strong> калькулятор является справочным инструментом. Фикховые случаи могут различаться в зависимости от причины пропуска и обстоятельств. В сомнительных случаях результат следует уточнить у знающего учёного.</div>
+
+<section class="card">
+<h2>1. Укажите период</h2>
+<div class="grid">
+<div><label for="from">С какого года</label><input id="from" type="number" min="1900" max="2100" value="2020"></div>
+<div><label for="to">По какой год</label><input id="to" type="number" min="1900" max="2100" value="2025"></div>
+</div>
+<div class="grid" style="margin-top:14px">
+<div><label for="current">До какого Рамадана считаем задержку</label><input id="current" type="number" min="1900" max="2100" value="2026"></div>
+<div><label for="price">Цена одного мудда, ₽</label><input id="price" type="number" min="0" max="1000000" step="1" value="150"></div>
+</div>
+<p class="muted">Если весь Рамадан был пропущен, по умолчанию ставится 30 дней. В каждом году количество можно изменить.</p>
+</section>
+
+<section class="card">
+<h2>2. Пропуски по годам</h2>
+<div id="years"></div>
+</section>
+
+<section class="card">
+<h2>3. Результат</h2>
+<div class="result">
+<div class="metric"><span>Када</span><strong id="qada">0</strong></div>
+<div class="metric"><span>Муддов фидьи</span><strong id="mudd">0</strong></div>
+<div class="metric"><span>Объём пищи</span><strong id="liters">0 л</strong></div>
+<div class="metric"><span>Расчётная сумма</span><strong id="money">0 ₽</strong></div>
+</div>
+</section>
+
+<section class="card">
+<h2>Подробный расчёт</h2>
+<div class="tablewrap">
+<table class="table">
+<thead><tr><th>Год</th><th>Пропущено</th><th>Прошло Рамаданов</th><th>Муддов</th><th>Сумма</th></tr></thead>
+<tbody id="summary"></tbody>
+</table>
+</div>
+</section>
+
+<section class="card">
+<h2>Проверка и печать</h2>
+<div class="actions"><button id="print">Распечатать результат</button><button id="reset" class="secondary">Сбросить</button></div>
+<p class="footer">В расчёте 1 мудд принят приблизительно за 0,51 л основной пищи. Денежная сумма — пересчёт количества муддов по цене, которую ввёл пользователь.</p>
+</section>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const from=$('from'),to=$('to'),current=$('current'),price=$('price'),years=$('years'),summary=$('summary');
+const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(n);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function daysWord(n){return n%10===1&&n%100!==11?'день':(n%10>=2&&n%10<=4&&!(n%100>=12&&n%100<=14)?'дня':'дней')}
+function readInt(el,a,b){let n=parseInt(el.value,10);if(!Number.isFinite(n))n=a;return clamp(n,a,b)}
+function build(){
+ let a=readInt(from,1900,2100),b=readInt(to,1900,2100);
+ if(a>b){[a,b]=[b,a];from.value=a;to.value=b}
+ years.innerHTML='';
+ if(b-a>50){years.innerHTML='<div class="note">Максимальный период — 51 Рамадан.</div>';calc();return}
+ for(let y=a;y<=b;y++){
+  const row=document.createElement('div');row.className='card';row.style.marginTop='10px';row.dataset.year=y;
+  row.innerHTML='<div class="year">Рамадан '+y+'</div><div class="grid"><div><label>Пропущено дней</label><input class="ydays" type="number" min="0" max="30" value="30"></div><div><label>Причина задержки</label><select class="reason"><option value="no">Без уважительной причины</option><option value="yes">Была уважительная причина</option><option value="unknown">Не уверен — проверить отдельно</option></select></div></div><p class="muted info" style="margin-bottom:0"></p>';
+  years.appendChild(row);
+ }
+ years.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc));
+ years.querySelectorAll('select').forEach(x=>x.addEventListener('change',calc));
+ calc();
+}
+function calc(){
+ const cur=readInt(current,1900,2100),p=Math.max(0,parseFloat(price.value)||0);
+ let qada=0,totalMudd=0;
+ summary.innerHTML='';
+ years.querySelectorAll('[data-year]').forEach(row=>{
+  const y=Number(row.dataset.year),d=clamp(parseInt(row.querySelector('.ydays').value,10)||0,0,30),reason=row.querySelector('.reason').value;
+  const elapsed=Math.max(0,cur-y);
+  const m=reason==='no'?d*elapsed:0;
+  qada+=d;totalMudd+=m;
+  const info=row.querySelector('.info');
+  if(!d) info.textContent='Пропусков нет.';
+  else if(reason==='yes') info.textContent='Уважительная причина указана: фидья за задержку не начислена; када остаётся в расчёте.';
+  else if(reason==='unknown') info.textContent='Причина требует уточнения — фидья за задержку пока не включена.';
+  else if(!elapsed) info.textContent='Задержка до следующего Рамадана ещё не учитывается.';
+  else info.textContent=d+' '+daysWord(d)+' × '+elapsed+' прошедших Рамадана = '+m+' муддов.';
+  if(d){
+   const tr=document.createElement('tr');
+   tr.innerHTML='<td>'+y+'</td><td>'+d+'</td><td>'+elapsed+'</td><td>'+m+'</td><td>'+fmt(m*p)+' ₽</td>';
+   summary.appendChild(tr);
+  }
+ });
+ $('qada').textContent=fmt(qada)+' '+daysWord(qada);
+ $('mudd').textContent=fmt(totalMudd);
+ $('liters').textContent=fmt(totalMudd*.51)+' л';
+ $('money').textContent=fmt(totalMudd*p)+' ₽';
+}
+[from,to].forEach(x=>x.addEventListener('input',build));
+[current,price].forEach(x=>x.addEventListener('input',calc));
+$('print').addEventListener('click',()=>window.print());
+$('reset').addEventListener('click',()=>{from.value=2020;to.value=2025;current.value=2026;price.value=150;build()});
+build();
+})();
+</script>
+</body>
+</html>
