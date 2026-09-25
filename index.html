@@ -74,7 +74,7 @@ button.secondary{background:var(--accent2);color:var(--accent)}button:focus-visi
 <section class="card">
 <h2>Проверка и печать</h2>
 <div class="actions"><button id="print">Распечатать результат</button><button id="reset" class="secondary">Сбросить</button></div>
-<p class="footer">В расчёте 1 мудд принят приблизительно за 0,51 л основной пищи. Денежная сумма — пересчёт количества муддов по цене, которую ввёл пользователь.</p>
+<p class="footer">В расчёте 1 мудд принят приблизительно за 0,544 кг основной пищи. Денежная сумма — пересчёт количества муддов по цене, которую ввёл пользователь.</p>
 </section>
 </main>
 
@@ -128,7 +128,7 @@ function calc(){
  });
  $('qada').textContent=fmt(qada)+' '+daysWord(qada);
  $('mudd').textContent=fmt(totalMudd);
- $('liters').textContent=fmt(totalMudd*.51)+' л';
+ $('liters').textContent=fmt(totalMudd*.55)+' кг';
  $('money').textContent=fmt(totalMudd*p)+' ₽';
 }
 [from,to].forEach(x=>x.addEventListener('input',build));
