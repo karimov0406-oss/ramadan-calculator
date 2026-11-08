@@ -616,8 +616,10 @@ input:focus-visible{
     }
 
 
-    if(end - start > 50){
 if(end - start > 100){
+    showError('Ошибка в данных. Максимальный период — 101 Рамадан.');
+    return;
+}
 if(end - start > 100){
       return;
     }
