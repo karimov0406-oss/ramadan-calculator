@@ -753,15 +753,14 @@ if(end - start > 100){
     }
 
 
-    if(end - start > 50){
+    if(end - start > 100){
 
-      showError(
-        'Ошибка в данных. Максимальный период — 100 Рамадан.'
-      
+  showError(
+    'Ошибка в данных. Максимальный период — 101 Рамадан.'
+  );
 
-      return;
+  return;
     }
-
 
     const rows = years.querySelectorAll('[data-year]');
 
